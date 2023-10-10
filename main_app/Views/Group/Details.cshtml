@@ -1,0 +1,178 @@
+﻿@model main_app.Models.Api.Group
+@Scripts.Render("~/bundles/jquery")
+
+@{
+    ViewBag.Title = "View";
+    main_app.Models.Api.Post post = new main_app.Models.Api.Post();
+}
+
+
+<div>
+    <hr />
+    <div class="w-100">
+        <img src="@Model.ImgSrc" class="img-fluid border" alt="Group IMG" />
+    </div>
+    <div class="row m-3">
+        <div class="col-lg">
+            <p class="h3">@Model.Name  - @Model.Kind.Name</p>
+
+        </div>
+        <div class="col-lg float-lg-right">
+            @if (ViewBag.isOwner)
+                {
+                    <p class="h5 float-lg-right">You are owner this group</p>
+                }
+                else
+                {
+                    <div>
+                        @if ((bool)ViewBag.isJoin == false)
+                        {
+                            <input type="button" class="float-right btn btn-success" value="Join" onclick="location.href='@Url.Action("Join", "Group", new { group_id = Model.Id })'" />
+                        }
+                        else
+                        {
+                            if ((bool?)ViewBag.isMember ?? false)
+                            {
+                                <div class="float-right">
+                                <input type="button" class="btn btn-danger px-4"  value="Leave" onclick="location.href='@Url.Action("Leave", "Group", new { group_id = Model.Id })'" />
+                                    </div>
+                            }
+                            else
+                            {
+                                <span class="float-right bg-info p-3">Wait</span>
+                            }
+                        }
+                    </div>
+                }
+        </div>
+    </div>
+
+    @if((bool?)ViewBag.isMember ?? false || ViewBag.isOwner || User.IsInRole("ROLE_ADMIN"))
+    {
+        <div class="row ml-3">
+            <div class="p-2">
+                <input type="button" class="btn btn-info" value="Show Courses" onclick="location.href='@Url.Action("CoursesByGroup", "Course", new { groupID = Model.Id })'" />
+            </div>
+            <div class="p-2">
+                <input type="button" class="btn btn-dark" value="Show Members" onclick="location.href='@Url.Action("MemberInfo", "Group", new { groupID = Model.Id,isAccept = true })'" />
+            </div>
+        </div>
+    }
+
+</div>
+
+@if ((ViewBag.isMember != null && (bool)ViewBag.isMember) || ViewBag.isOwner || User.IsInRole("ROLE_ADMIN"))
+{
+    <hr />
+    <div id="myContent">
+
+        <input type="button" value="Add Post" class="btn btn-secondary col-8 offset-2  my-2 mb-4" onclick="location.href='@Url.Action("Create", "Post", new { groupID = Model.Id })'" />
+        <div id="posts_handler" post_page="1"></div>
+
+        <button class="btn btn-dark col-4 offset-4 mt-1" onclick="loadPostsFromPartialView()" id="loadButton">Load More</button>
+    </div>
+
+}
+
+@if (ViewBag.isOwner || User.IsInRole("ROLE_ADMIN") )
+{
+    <hr />
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+}
+
+
+@if ((ViewBag.isMember != null && (bool)ViewBag.isMember) || ViewBag.isOwner || User.IsInRole("ROLE_ADMIN"))
+{
+
+    <script type="text/javascript">
+    var groupID = @Model.Id;
+
+    $(document).ready(function () {
+
+        console.log('hello');
+        setInterval(loadPostsFromPartialView(), 200);
+
+
+    });
+
+
+
+    const loadPostsFromPartialView = function () {
+
+        let page_post = $('#posts_handler').attr('post_page');
+
+
+
+        $.ajax({
+            url: "/Post/PostByGroupPartialView?groupID=" + groupID + "&page=" + page_post,
+                type: "GET",
+                success: function (response) {
+                    if ((response + '').length > 10) {
+                        $('#posts_handler').append(response)
+                        page_post = Number(page_post) + 1;
+                        $('#posts_handler').attr('post_page', page_post);
+                    } else {
+                        $('#myContent').append('<div style="color:red; text-align:center;" ><p>No more Posts</p></div>')
+                        $('#loadButton').attr('disabled', 'disabled')
+                    }
+                 },
+                error: function (xhr, status) {
+                    alert("Error API - Posts");
+                }
+            });
+    }
+
+    const loadCommFromAPI = function (modalId) {
+        let id = "#modalId" + modalId
+        let modalTrigger = '#ModalTrigger' + modalId
+        let counter = $(modalTrigger).attr('commsite')
+        console.log('test' + counter)
+        counter = Number(counter) + 1;
+        $.ajax({
+            url: "/Comment/CommentsByPostIDPartialView?postId=" + modalId +"&pageC="+counter,
+                type: "GET",
+            success: function (response) {
+                console.log('twice ajax')
+                    if ((response + '').length > 10) {
+                        $(id).find('#commHandler').append(response)
+                        $(modalTrigger).attr('commsite', counter);
+                    } else {
+                        $(id).find('#commHandler').append('<div>No more Comments</div>')
+                        $(id).find('#loadComm').attr('disabled', 'disabled')
+                    }
+                },
+                error: function (xhr, status) {
+                    alert("Error API");
+                }
+            });
+    }
+
+
+
+    const LoadComm = function (modalID) {
+        let id = "#modalId" + modalID
+        let modalTrigger = '#ModalTrigger' + modalID
+        let counter = $(modalTrigger).attr('commsite');
+        $(id).on('show.bs.modal', function () {
+            console.log('twice')
+            loadCommFromAPI(modalID)
+            $(this).off();
+        });
+
+    }
+
+    const closeModal = function (modalID) {
+        let id = "#modalId" + modalID
+        let modalTrigger = '#ModalTrigger' + modalID
+        $(id).on('hidden.bs.modal', function () {
+            $(id).find('#commHandler').html(' ')
+
+            $(modalTrigger).attr('commsite', 0);
+            $(id).find('#loadComm').attr('disabled', false)
+        })
+    }
+    </script>
+}

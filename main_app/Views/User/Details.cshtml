@@ -1,0 +1,87 @@
+﻿@model main_app.Models.Api.SimpleUser
+
+@{
+    ViewBag.Title = "Details";
+    var yourID = (bool)ViewBag.yourID;
+}
+
+<h2>@ViewBag.UserName</h2>
+
+
+<div class="row">
+
+    <div class="col-lg col-12 "
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.PhoneNumber)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Surname)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Surname)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            
+
+            @if (yourID)
+            {
+                <dt>
+
+                </dt>
+
+                <dd>
+                    <hr />
+                    <a href="@Url.Action("Edit",new { id = Model.Id})" class="btn btn-primary">Edit</a>
+                    @* <a href="@Url.Action("Delete",new { id = Model.Id})" class="btn btn-dark">Edit</a>*@
+                </dd>
+            }
+
+        </dl>
+     @if (yourID)
+     {
+    <hr />
+                <ul class="pt-2">
+                   <li class="nav-item">
+                    @Html.ActionLink("My Groups", "GroupsByMember", "Group", null, new { @class = "nav-link btn btn-info my-4" })
+                    </li>
+                    <li class="nav-item">
+                    @Html.ActionLink("My Posts", "Index", "Post", new { searchString = Session["UserID"], showForm = false }, new { @class = "nav-link btn btn-info my-4" })
+                </li>
+                    @*<li>My Courses - in deep dev --full TODO implement java and c#</li>*@
+                    @if (User.IsInRole("ROLE_EDUCATOR"))
+                    {
+                         <li class="nav-item">
+                             @Html.ActionLink("My Groups Create", "Index", "Group", new { me = true }, new { @class = "nav-link btn btn-dark my-4" })
+                         </li>
+                         <li class="nav-item">
+                             @Html.ActionLink("My Courses Create", "Index", "Course", new { me = true }, new { @class = "nav-link btn btn-dark my-4" })
+                         </li>
+                    }
+                    </ul>
+     }
+
+
+    </div>
+
+    
+        <div class=" col-lg col-12 pt-md-0 pt-2">
+            <img src="@Model.ImgSrc" alt="My Photo" class="img-thumbnail " style="height:200px" />
+
+        </div>
+    
+</div>
+

@@ -1,0 +1,179 @@
+﻿@model main_app.Models.Api.Course
+@{
+    int counter = 1;
+}
+<div>
+    <h4>Course: @Model.Name</h4>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#courseInfo">Info</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#courseLesson">Lessons</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="courseInfo">
+            @if (User.IsInRole("ROLE_ADMIN"))
+            {
+                <hr />
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.AuthorId)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.AuthorId)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.GroupeId)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.GroupeId)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Published)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Published)
+                    </dd>
+
+
+
+                </dl>
+                <hr />
+            }
+            <div class="row">
+                <div class="col-lg-6">
+                    <dl class="dl-horizontal">
+                        <dt>
+                            Kind:
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Kind.Name)
+                        </dd>
+
+                        <dt>
+                            @Html.DisplayNameFor(model => model.Decription)
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.Decription)
+                        </dd>
+                        <dt>
+                           Published Date
+                        </dt>
+
+                        <dd>
+                            @Html.DisplayFor(model => model.PublishedDate)
+                        </dd>
+                    </dl>
+                </div>
+
+            </div>
+        </div>
+        <div class="tab-pane fade" id="courseLesson">
+            <ul class="nav nav-tabs mt-3">
+                @foreach (main_app.Models.Api.Lesson lesson in Model.Lessons)
+                {
+                    var lessonC = "Lesson " + counter;
+                    var lessonId = "lesson" + lesson.Number;
+
+                    <li class="nav-item">
+                        <a class="nav-link " style="color:green" data-toggle="tab" href="#@lessonId">@lessonC</a>
+                    </li>
+                    counter++;
+                }
+            </ul>
+            <div class="tab-content">
+                @foreach (main_app.Models.Api.Lesson lesson in Model.Lessons)
+                {
+                    var lessonId = "lesson" + lesson.Number;
+                    <div class="tab-pane fade" id="@lessonId">
+                        <div class="row mt-2">
+                            <div class="col-lg-6">
+                                <dl class="dl-horizontal">
+                                    <dt>
+                                        Subject:
+                                    </dt>
+
+                                    <dd>
+                                        @lesson.Subject
+                                    </dd>
+                                    <dt>
+                                        Purpose:
+                                    </dt>
+
+                                    <dd>
+                                        @lesson.Conntent
+                                    </dd>
+                                    <dt>
+                                        Homework:
+                                    </dt>
+
+                                    <dd>
+                                        @lesson.Homework
+                                    </dd>
+                                    <dt>
+                                        Files:
+                                    </dt>
+
+                                    <dd>
+                                        <div class="list-group w-50 ml-2">
+                                            @if (lesson.FileSrc != null)
+                                            {
+                                                foreach (string item in lesson.FileSrc)
+                                                {
+                                                    var nameF = item.Split(new string[] { "sRIuzcoJ1t" },System.StringSplitOptions.None)[1];
+                                                    <a href="@item" class="list-group-item">@nameF</a>
+                                                }
+                                            }
+                                        </div>
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="col-lg-6">
+                                @if (lesson.VideoLink != null && lesson.VideoLink != "")
+                                {
+                                    <div class="embed-responsive embed-responsive-16by9">
+                                        <iframe class="embed-responsive-item" src="@lesson.VideoLink" allowfullscreen></iframe>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+    @if (User.IsInRole("ROLE_EDUCATOR") &&((SelectList)ViewBag.GropuID).Count()>0)
+    {
+        using (Html.BeginForm("AddCourse", "Group", FormMethod.Get))
+        {
+            <hr />
+            <p>
+                <div class="form-group">
+                    <div class="col-md-10 pl-0">
+                        @Html.DropDownList("GropuID", null, htmlAttributes: new { @class = "form-control" })
+                    </div>
+                </div>
+                @Html.HiddenFor(model => model.Id)
+                <div class="form-group">
+                    <input type="submit" value="Add To Group" class="btn btn-success form-control" />
+                </div>
+            </p>
+            <hr />
+        }
+    }
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+</p>

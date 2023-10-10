@@ -1,0 +1,33 @@
+﻿@model main_app.Models.Api.Event
+
+@{
+    ViewBag.Title = "Details";
+}
+<div>
+    <h4>Event</h4>
+    <hr />
+    <img src="@Model.ImgSrc" class="img-fluid" alt="Responsive image">
+
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Decription)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Decription)
+        </dd>
+
+
+
+    </dl>
+</div>

@@ -1,0 +1,26 @@
+﻿@model IEnumerable<main_app.Models.Api.Comment>
+@{
+    Dictionary<string, string> authors = ViewBag.Authors;
+}
+
+@foreach (var item in Model)
+{
+    <div class="card mx-auto mb-3">
+       
+        <div class="card-body">
+            @item.Conntent @*- @item.Id*@
+        </div>
+        <footer class="blockquote-footer">
+            @item.CreatedTime <cite title=@authors[item.Id]>@authors[item.Id]</cite>
+
+          
+                @if (ViewBag.isGroupOwner || item.AuthorId.Equals(ViewBag.authorId))
+                {<span class="float-right mr-2" style="font-size: 15px">
+                        <a href="@Url.Action("Edit","Comment",new { id = item.Id,groupId = ViewBag.groupID})">Edit</a>
+                        <span>|</span>
+                        <a href="@Url.Action("Delete","Comment",new {  id = item.Id,groupId = ViewBag.groupID})">Delete</a>
+                    </span>
+                }
+            </footer>
+    </div>
+}

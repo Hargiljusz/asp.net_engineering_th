@@ -1,0 +1,49 @@
+﻿@model  PagedList.IPagedList<main_app.Models.Api.Group>
+@using PagedList.Mvc
+@{
+    ViewBag.Title = "Index";
+    bool showForm = (bool)ViewBag.showForm;
+}
+
+<h2>All Groups</h2>
+
+
+
+@if (showForm) {
+    using (Html.BeginForm("Index", "Group", FormMethod.Get))
+    {
+    <p>
+        Search: @Html.TextBox("searchString", ViewBag.CurrentFilter as string)
+        <input type="submit" value="Search" />
+    </p>
+    }
+}
+<hr />
+<div class="card-columns">
+    @foreach (var item in Model)
+    {
+
+        <div class="card">
+            <div class="card-body">
+                <img class="card-img" src="@item.ImgSrc" alt="IMG">
+                <h5 class="card-title"> @Html.DisplayFor(modelItem => item.Name)</h5>
+                <h6 class="card-subtitle mb-2 text-muted">@Html.DisplayFor(modelItem => item.Kind.Name)</h6>
+                @Html.ActionLink("Show", "Details", new { id = item.Id }) |
+                @if ((Session["UserID"] != null && ((string)Session["UserID"] == item.OwnerId)) || User.IsInRole("ROLE_ADMIN"))
+                {
+                    <span>|</span>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span>|</span>
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                }
+            </div>
+        </div>
+
+    }
+    </div>
+    <br />
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+    @Html.PagedListPager(Model, page => Url.Action("Index",
+        new { page, currentFilter = ViewBag.CurrentFilter, me = !showForm })
+    )
+

@@ -1,0 +1,66 @@
+﻿@model PagedList.PagedList<main_app.Models.Api.Course>
+    @using PagedList.Mvc; 
+
+@{
+    ViewBag.Title = "Courses By Group";
+}
+
+<h2>Courses By Group</h2>
+
+
+<table class="table">
+    <tr>
+
+        <th>
+            Name
+        </th>
+        <th>
+            Kind
+        </th>
+        <th>
+            Decription
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Kind.Name)
+            </td>
+            <td>
+                @{
+                    if (item.Decription.Length > 12)
+                    {
+
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(modelItem => item.Decription)
+                    }
+                }
+            </td>
+            <td>
+                @Html.ActionLink("Show", "Details", new { id = item.Id })
+
+                @if ((Session["UserID"] != null && ((string)Session["UserID"] == item.AuthorId)) || User.IsInRole("ROLE_ADMIN"))
+                {
+                    <span>|</span>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span>|</span>
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                }
+            </td>
+        </tr>
+    }
+
+</table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+    new { page, groupID = ViewBag.GroupID })
+)

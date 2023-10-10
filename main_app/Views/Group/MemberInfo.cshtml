@@ -1,0 +1,105 @@
+﻿@model PagedList.PagedList<main_app.Models.Api.MemberData>
+@using PagedList.Mvc;
+@Scripts.Render("~/bundles/jquery")
+@{
+    ViewBag.Title = "MemberInfo";
+}
+
+<h2>Members </h2>
+
+@if (User.IsInRole("ROLE_ADMIN") || User.IsInRole("ROLE_EDUCATOR"))
+{
+    <div class="custom-control custom-switch">
+        @if ((bool)ViewBag.isAccept)
+        {
+            <input type="checkbox" class="custom-control-input" id="acceptCheckbox" checked>
+        }
+        else
+        {
+            <input type="checkbox" class="custom-control-input" id="acceptCheckbox">
+        }
+        <label class="custom-control-label" for="acceptCheckbox"> Is Accept</label>
+    </div>
+}
+
+    <table class="table">
+
+        <tr>
+            <th>
+                Surname
+            </th>
+            <th>
+                Name
+            </th>
+
+            @if (User.IsInRole("ROLE_ADMIN") || User.IsInRole("ROLE_EDUCATOR"))
+            {
+                <th>
+                    Email
+                </th>
+                <th>
+                    Phonenumber
+                </th>
+
+                <th>Options</th>
+            }
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                  @if (User.IsInRole("ROLE_ADMIN") || User.IsInRole("ROLE_EDUCATOR"))
+                {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+              
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Phonenumber)
+                    </td>
+
+
+                    <td>
+                        @Html.ActionLink("Details", "Details","User", new { id = item.Id }, htmlAttributes: new { @class = "btn btn-info" }) |
+                        @Html.ActionLink("Remove", "Leave", new { group_id = ViewBag.GroupId, userID = item.Id }, htmlAttributes: new { @class = "btn btn-danger" })
+                        @if (!(bool)ViewBag.isAccept)
+                        {
+                            <span> | </span>
+                            @Html.ActionLink("Accept", "Accept", new { group_id = ViewBag.GroupId, userID = item.Id }, htmlAttributes: new { @class = "btn btn-success" })
+                        }
+                    </td>
+                }
+            </tr>
+        }
+
+    </table>
+    <br />
+    Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+    @Html.PagedListPager(Model, page => Url.Action("MemberInfo",
+        new { page })
+    )
+    <br />
+    <div class="">
+        <input type="button" class="btn btn-success px-4" value="Back to group" onclick="location.href='@Url.Action("Details", "Group", new { id = ViewBag.GroupId })'" />
+    </div>
+
+    <script>
+    var gID = @ViewBag.GroupId;
+    $(document).ready(function () {
+         console.log(@ViewBag.GroupId);
+        $('#acceptCheckbox').change(function () {
+            var isChecked = $(this).prop('checked');
+            console.log(isChecked);
+
+            document.location.href = '@Html.Raw(Url.Action("MemberInfo", "Group", new { groupID = ViewBag.GroupId, isAccept = !(bool)ViewBag.isAccept }))'
+
+        });
+    });
+    </script>

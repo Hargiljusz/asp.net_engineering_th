@@ -1,0 +1,91 @@
+﻿@model  IEnumerable<main_app.Models.Api.Post>
+
+@foreach (main_app.Models.Api.Post item in Model)
+{
+    #region modal content
+    var modalName = "modalId" + item.Id;
+
+    <div class="modal fade" id=@modalName onclick="closeModal(@item.Id)">
+        <div class="modal-dialog modal-sm modal-lg">
+            <div class="modal-content p-3">
+                <div class="modal-header">
+                    <h1 class="mb-2 modal-title">@item.Name</h1>
+                    <br />
+                </div>
+                <div class="modal-body">
+                    @item.Decription<br />
+                    @item.CreateDate
+                    <hr />
+                    @if (item.FileSrc != null && item.FileSrc.Count > 0)
+                    {
+                        <h4>Files:</h4>
+                        <div class="list-group w-25 ml-2">
+                            @foreach (var src in item.FileSrc)
+                            {
+                                var nameF = src.Split(new string[] { "sRIuzcoJ1t" }, System.StringSplitOptions.None)[1];
+                                <a href="@src" class="list-group-item">@nameF</a>
+                            }
+                        </div> <hr />
+                    }
+
+                    <input type="button" value="Add Comment" class="btn btn-success btn-sm mb-2" onclick="location.href='@Url.Action("Create", "Comment",new { postId = item.Id,groupID = item.GroupId})'" />
+                    <div id="commHandler"></div>
+
+                    <button class="btn btn-dark mx-auto mt-1" onclick="loadCommFromAPI(@item.Id)" id="loadComm">Load More</button>
+                </div>
+
+                <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+
+        </div>
+    </div>
+
+    #endregion
+}
+
+
+@foreach (main_app.Models.Api.Post item in Model)
+{
+    #region modal trigger
+
+    var modalName = "#modalId" + item.Id;
+
+    var idTrigger = "ModalTrigger" + item.Id;
+
+
+
+    <div class="card mb-3 mx-auto w-75">
+        <a href="#" data-toggle="modal" data-target=@modalName style="text-decoration:none" onclick="LoadComm(@item.Id)" id=@idTrigger commsite="0">
+            @if (item.MainImgSrc != null)
+            {
+                <img class="card-img-top" src=@item.MainImgSrc alt="img">
+            }
+            <div class="card-body">
+                <h5 class="card-title">@item.Name</h5>
+                @{
+                    var temD = item.Decription.Length > 100 ? item.Decription.Substring(0, 100) : item.Decription;
+                }
+                <p class="card-text">@temD</p>
+
+            </div>
+
+        </a>
+        <footer class="blockquote-footer ">
+            @item.CreateDate
+            @{
+                if (ViewBag.isGroupOwner || (item.AuthorId != null && item.AuthorId.Equals((string)ViewBag.authorId)))
+                {<span class="float-right mr-2" style="font-size: 15px">
+                        <a href="@Url.Action("Edit","Post",new { id = item.Id})">Edit</a>
+                        <span>|</span>
+                        <a href="@Url.Action("Delete","Post",new { id = item.Id, groupID = ViewBag.groupId })">Delete</a>
+                    </span>
+                }
+            }
+        </footer>
+    </div>
+
+    #endregion
+}
+
+
+

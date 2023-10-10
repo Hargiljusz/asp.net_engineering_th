@@ -1,0 +1,209 @@
+﻿@model main_app.Models.CourseViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create Course</h2>
+
+@Scripts.Render("~/bundles/jquery")
+
+@using (Html.BeginForm("Create", "Course", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))
+{
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Decription, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Decription, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Decription, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.KindID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("KindID", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.KindID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.GroupID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("GropuID", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.GroupID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <hr />
+        <label for="lessons">Lessons</label>
+            <div>
+                 <div class="form-group">
+                    <label class="control-label col-md-2" for="Subject"> Subject</label>
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="Subject" name="Subject" type="text" value="" required />
+                    </div>
+                </div>
+
+                 <div class="form-group">
+                     <label class="control-label col-md-2" for="Conntent"> Purpose</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control text-box single-line" id="Conntent" name="Conntent" rows="6" value=""></textarea>
+                    </div>
+                </div>
+                 <div class="form-group">
+                    <label class="control-label col-md-2" for="Homework"> Homework</label>
+                    <div class="col-md-10">
+                        <textarea class="form-control text-box single-line" id="Homework" name="Homework" rows="3" value=""></textarea>
+                    </div>
+                </div>
+                 <div class="form-group">
+                    <label class="control-label col-md-2" for="VideoLink"> VideoLink</label>
+                    <div class="col-md-10">
+                        <input class="form-control text-box single-line" id="VideoLink" name="VideoLink" type="url" value="" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="filesLesson1"> Files:</label>
+                    <div class="col-md-10">
+                        <input class="form-control-file" id="filesLesson1" name="filesLesson1" type="file" multiple required accept="image/*,.doc,.docx,application/msword,.pdf" onchange="checkFiles(this.files,1)" />
+                    </div>
+                </div>
+                <input id="number" name="number" type="hidden" value="1">
+                <hr />
+            </div>
+        <div id="lessons">
+            
+        </div>
+
+        <button id="addLesson" type="button" class=" btn btn-info">Add Lesson</button>
+
+
+        <hr />
+        <input id="current_counter" name="current_counter" type="hidden" value="1" >
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+
+<script>
+    var counter = 2;
+    var countListen = 2;
+    $("#addLesson").click(function () {
+        if (countListen >= 11) {
+            alert("Max 10 Lessons")
+        }
+        var html = '';
+
+        //Subject
+        html += '<div id="inputFormRow">'
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "Subject" > Subject</label>'
+        html += '<div class="col-md-10">'
+        html += '<input class="form-control text-box single-line" id="Subject" name="Subject" type="text" value="" required/>'
+        html += ' </div>'
+        html += ' </div >';
+
+        //Content
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "Conntent" > Conntent</label>'
+        html += '<div class="col-md-10">'
+        html += ' <textarea class="form-control text-box single-line" id="Conntent" name="Conntent" rows="6" value=""></textarea>'
+        html += ' </div>'
+        html += ' </div >';
+
+        //HomeWork
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "Homework" > Homework</label>'
+        html += '<div class="col-md-10">'
+        html += '<textarea class="form-control text-box single-line" id="Homework" name="Homework" rows="3" value="" ></textarea>'
+        html += ' </div>'
+        html += ' </div >';
+
+        //VideoLink
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "VideoLink" > VideoLink</label>'
+        html += '<div class="col-md-10">'
+        html += '<input class="form-control text-box single-line" id="VideoLink" name="VideoLink" type="url" value="" />'
+        html += ' </div>'
+        html += ' </div >';
+
+        //File
+        let fileNameC = "filesLesson" + counter;
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "' + fileNameC + '" > Files:</label>'
+        html += '<div class="col-md-10">'
+        html += '<input class="form-control-file" id="' + fileNameC + '" name="' + fileNameC + '" type="file" multiple required accept="image/*,.doc,.docx,application/msword,.pdf" onchange="checkFiles(this.files,' + counter +')"/>'
+        html += ' </div>'
+        html += ' </div >';
+        html += ' <input id="number" name="number" type="hidden" value="' + counter+'">';
+
+
+
+        html += ' <button id="removeRow" type="button" class="btn btn-danger ">Remove</button>';
+        html += ' <hr /></div>'
+        if (countListen <= 10) {
+            $('#lessons').append(html);
+        }
+        console.log('test');
+        $('input.current_counter').val(countListen);
+
+        counter++;
+        countListen++;
+    });
+
+    // remove row
+    $(document).on('click', '#removeRow', function () {
+        countListen--;
+        $(this).closest('#inputFormRow').remove();
+    });
+
+
+    function checkFiles(files) {
+        if (files.length > 5) {
+            alert("Max 5 files");
+
+        }
+    }
+
+
+    function checkFiles(files, t) {
+       /* let fileNames = $.map(files, val => val.name)
+        $('input[name ="fileNameForLesson' + t + '"]').val(fileNames)
+        let i = $('input[name ="fileNameForLesson' + t + '"]').val()
+        console.log(i)*/
+
+        if (files.length > 5) {
+            alert("Max 5 files");
+            $('input[name ="filesLesson' + t + '"]').val('');
+
+        }
+
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].size > 10597724) {
+                alert("To BIG");
+                $('input[name ="filesLesson' + t + '"]').val('');
+            }
+        }
+    }
+
+</script>

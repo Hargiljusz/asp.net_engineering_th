@@ -1,0 +1,75 @@
+﻿@model PagedList.IPagedList<main_app.Models.Api.Event>
+@using PagedList.Mvc
+@{
+    ViewBag.Title = "Home Page";
+}
+
+@if (!User.Identity.IsAuthenticated)
+{
+    <div class="jumbotron">
+        <h1>Hello</h1>
+        <p class="lead">Here you can find groups where you can learn new things and share your knowledge</p>
+        <p>@Html.ActionLink("Just Join", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink", @class = "btn btn-primary" })</p>
+    </div>
+}
+else
+{
+<div class="jumbotron">
+    <h1>Hi @User.Identity.Name</h1>
+    <p class="lead">New Events Below</p>
+</div>
+}
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        if (Model.TotalItemCount != null &&  Model.TotalItemCount == 0)
+        {<div class="row">
+                <h1 class="col-md-offset-5">No Data</h1>
+            </div>
+        }
+        else
+        {<div>
+                @foreach (var item in Model)
+                {<div class="my-2">
+                        <a href="/Event/Details/@item.Id">
+                            <div class="card mx-auto" style="width: 75%; border: solid 2px black;">
+                                <img class="card-img-top" src="@item.ImgSrc" alt="Card image cap">
+                                <hr />
+                                <div class="card-body">
+                                    <h5 class="card-title">@item.Name</h5>
+                                    @{ 
+                                        var temS = item.Decription.Length > 200 ? item.Decription.Substring(0,200) : item.Decription;
+                                    }
+                                    <p class="card-text">@temS</p>
+                                </div>
+
+
+                                @if (User.IsInRole("ROLE_ADMIN"))
+                                {<footer class="blockquote-footer">
+                                        <span class="float-right mr-2" style="font-size: 15px">
+                                            <a href="@Url.Action("Edit", "Event", new { id = item.Id })">Edit</a>
+                                            <span>|</span>
+                                            <a href="@Url.Action("Delete", "Event", new { id = item.Id })">Delete</a>
+                                        </span>
+                                    </footer>
+                                }
+
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+
+        }
+
+        <hr />
+        <span>Page</span> @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) <span>of</span> @Model.PageCount
+
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }), new PagedListRenderOptions
+        {
+            LiElementClasses = new string[] { "page-item" },
+            UlElementClasses = new string[] { "pagination pagination-lg" }
+        })
+    }
+
+

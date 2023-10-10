@@ -1,0 +1,228 @@
+﻿@model main_app.Models.Api.Course
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+@Scripts.Render("~/bundles/jquery")
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "Course", FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))
+{
+
+    <div class="form-horizontal">
+        <h4>CourseViewModel</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Decription, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Decription, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Decription, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Published, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.CheckBoxFor(model => model.Published, new { htmlAttributes = new { @class = "form-check-input" } })
+                    @Html.ValidationMessageFor(model => model.Published, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("KindID", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("KindID", null, htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+
+
+        <hr />
+        <h3>Lessons:</h3>
+
+        @for (int i = 0; i < Model.Lessons.Count; i++)
+        {
+            <div id="inputFormRow">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Lessons[i].Subject, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Lessons[i].Subject, new { htmlAttributes = new { @class = "form-control", @required = "required", id = "Subject", Name = "Subject" } })
+                        @Html.ValidationMessageFor(model => model.Lessons[i].Subject, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Lessons[i].Conntent, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(model => model.Lessons[i].Conntent, 6, 40, new { @class = "form-control", id = "Conntent", Name = "Conntent" })
+                        @Html.ValidationMessageFor(model => model.Lessons[i].Conntent, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Lessons[i].Homework, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(model => model.Lessons[i].Homework, 3, 40, new { @class = "form-control", id = "Homework", Name = "Homework" })
+                        @Html.ValidationMessageFor(model => model.Lessons[i].Homework, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Lessons[i].VideoLink, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Lessons[i].VideoLink, new { htmlAttributes = new { @class = "form-control", id = "VideoLink", Name = "VideoLink" } })
+                        @Html.ValidationMessageFor(model => model.Lessons[i].VideoLink, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h4>Files</h4>
+                    <ul>
+                        @foreach (var item in Model.Lessons[i].FileSrc)
+                        {
+                            string linkSrc = item.Split('/')[5].Split(new[] { "sRIuzcoJ1t" },StringSplitOptions.None)[1];
+                            <li><a href=item id="old_files" name="old_files">
+                                 @linkSrc</a>
+                            </li>
+
+                        }
+                    </ul>
+                </div>
+                <div class="form-group">
+                    @{
+                        var name = "filesLesson" + Model.Lessons[i].Number;
+                    }
+                    <label class="control-label col-md-2" for=@name> Files:</label>
+                    <div class="col-md-10">
+                        <input class="form-control-file" id=@name name=@name type="file" multiple accept="image/*,.doc,.docx,application/msword,.pdf" onchange="checkFiles(this.files,@Model.Lessons[i].Number)" />
+                    </div>
+                </div>
+                <input id="number" name="number" type="hidden" value=@Model.Lessons[i].Number>
+
+                <button id="removeRow" type="button" class="btn btn-danger ">Remove Lesson</button>
+                <hr />
+            </div>
+
+        }
+
+        <div id="lessons">
+
+        </div>
+        <button id="addLesson" type="button" class=" btn btn-info">Add Lesson</button>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-success" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+<script>
+    var counter =  @ViewBag.Current_Counter;
+    counter++;
+    var countListen = @ViewBag.Current_Counter;
+    countListen++;
+    $("#addLesson").click(function () {
+        if (countListen >= 11) {
+            alert("Max 10 Lessons")
+        }
+        var html = '';
+
+        //Subject
+        html += '<div id="inputFormRow">'
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "Subject" > Subject</label>'
+        html += '<div class="col-md-10">'
+        html += '<input class="form-control text-box single-line" id="Subject" name="Subject" type="text" value="" required/>'
+        html += ' </div>'
+        html += ' </div >';
+
+        //Content
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "Conntent" > Conntent</label>'
+        html += '<div class="col-md-10">'
+        html += ' <textarea class="form-control text-box single-line" id="Conntent" name="Conntent" rows="6" value=""></textarea>'
+        html += ' </div>'
+        html += ' </div >';
+
+        //HomeWork
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "Homework" > Homework</label>'
+        html += '<div class="col-md-10">'
+        html += '<textarea class="form-control text-box single-line" id="Homework" name="Homework" rows="3" value="" ></textarea>'
+        html += ' </div>'
+        html += ' </div >';
+
+        //VideoLink
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "VideoLink" > VideoLink</label>'
+        html += '<div class="col-md-10">'
+        html += '<input class="form-control text-box single-line" id="VideoLink" name="VideoLink" type="url" value="" />'
+        html += ' </div>'
+        html += ' </div >';
+
+        //File
+        let fileNameC = "filesLesson" + counter;
+        html += '<div class="form-group">'
+        html += '<label class="control-label col-md-2" for= "' + fileNameC + '" > Files:</label>'
+        html += '<div class="col-md-10">'
+        html += '<input class="form-control-file" id="' + fileNameC + '" name="' + fileNameC + '" type="file" multiple required accept="image/*,.doc,.docx,application/msword,.pdf" onchange="checkFiles(this.files,' + counter+')" />'
+        html += ' </div>'
+        html += ' </div >'
+        html += ' <input id="number" name="number" type="hidden" value="' + counter + '">';
+
+
+
+        html += ' <button id="removeRow" type="button" class="btn btn-danger ">Remove Lesson</button>';
+        html += ' <hr /></div>'
+        if (countListen <= 10) {
+            $('#lessons').append(html);
+        }
+        console.log(countListen + ' ' + counter);
+        $('input.current_counter').val(countListen);
+
+        counter++;
+        countListen++;
+    });
+
+    // remove row
+    $(document).on('click', '#removeRow', function () {
+        countListen--;
+        $(this).closest('#inputFormRow').remove();
+    });
+
+
+
+
+    function checkFiles(files) {
+        if (files.length > 5) {
+            alert("Max 5 files");
+
+        }
+    }
+
+    function checkFiles(files, t) {
+        if (files.length > 5) {
+            alert("Max 5 files");
+            $('input[name ="filesLesson' + t + '"]').val('');
+
+        }
+        for (var i = 0; i < files.length; i++) {
+            if (files[i].size > 10597724) {
+                alert("To BIG");
+                $('input[name ="filesLesson' + t + '"]').val('');
+            }
+        }
+    }
+
+</script>

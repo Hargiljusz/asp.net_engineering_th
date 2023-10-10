@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary ">
+        <a class="navbar-brand" href="@Url.Action("Index","Home")">WebApp IJ </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav mr-auto">
+
+                @*<li class="nav-item">
+                    @Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })
+                </li>*@
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Groups</a>
+                        <div class="dropdown-menu">
+                            @Html.ActionLink("My Groups", "GroupsByMember", "Group", null, new { @class = "dropdown-item" })
+                            @Html.ActionLink("ALL Groups", "Index", "Group", null, new { @class = "dropdown-item" })
+                            <div class="dropdown-divider"></div>
+                            @if (User.IsInRole("ROLE_ADMIN") || User.IsInRole("ROLE_EDUCATOR"))
+                            {
+                                @Html.ActionLink("New Group", "Create", "Group", null, new { @class = "dropdown-item" })
+                                @Html.ActionLink("My Groups Create", "Index", "Group", new { me = true }, new { @class = "dropdown-item" })
+                            }
+                            @if (User.IsInRole("ROLE_ADMIN"))
+                            {
+
+                            }
+                        </div>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Courses</a>
+                        <div class="dropdown-menu">
+                            @Html.ActionLink("ALL Courses", "Index", "Course", null, new { @class = "dropdown-item" })
+                            <div class="dropdown-divider"></div>
+                            @if (User.IsInRole("ROLE_ADMIN") || User.IsInRole("ROLE_EDUCATOR")) {
+                            @Html.ActionLink("New Course", "Create", "Course", null, new { @class = "dropdown-item" })
+                            @Html.ActionLink("My Courses Create", "Index", "Course", new { me = true }, new { @class = "dropdown-item" })}
+                            @if (User.IsInRole("ROLE_ADMIN"))
+                            {
+
+                            }
+                        </div>
+                    </li>
+                }
+                @if (User.IsInRole("ROLE_ADMIN"))
+                {
+                    <li class="nav-item">
+                        @Html.ActionLink("Events", "Index", "Event", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li>
+                        @Html.ActionLink("Kinds", "Index", "Kind", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                    <li>
+                        @Html.ActionLink("Users", "Index", "User", new { area = "" }, new { @class = "nav-link" })
+                    </li>
+                }
+
+            </ul>
+            @Html.Partial("_LoginPartial")
+        </div>
+    </nav>
+    <div class="container body-content mt-5 p-5">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year -Jakub Iwaniuk Application</p>
+        </footer>
+    </div>
+
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+
+</body>
+</html>
